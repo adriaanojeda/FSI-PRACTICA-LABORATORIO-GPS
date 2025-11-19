@@ -25,6 +25,9 @@ class Problem:
         other arguments."""
         self.initial = initial
         self.goal = goal
+        # Contador de nodos generados y visitados (Parte 3) 
+        self.nodes_generated = 0 
+        self.nodes_visited = 0
 
     def successor(self, state):
         """Given a state, return a sequence of (action, state) pairs reachable
@@ -45,6 +48,7 @@ class Problem:
         is such that the path doesn't matter, this function will only look at
         state2.  If the path does matter, it will consider c and maybe state1
         and action. The default method costs 1 for every step in the path."""
+        # La gestión del coste acumulado ya está en path_cost del nodo [cite: 10]
         return c + 1
 
     def value(self):
@@ -85,9 +89,14 @@ class Node:
 
     def expand(self, problem):
         """Return a list of nodes reachable from this node. [Fig. 3.8]"""
-        return [Node(next, self, act,
-                     problem.path_cost(self.path_cost, self.state, act, next))
-                for (act, next) in problem.successor(self.state)]
+        successors = []
+        for (act, next) in problem.successor(self.state):
+            new_node = Node(next, self, act,
+                            problem.path_cost(self.path_cost, self.state, act, next))
+            successors.append(new_node)
+            # Contabilizar el nodo generado (Parte 3) [cite: 25]
+            problem.nodes_generated += 1 
+        return successors
 
 
 # ______________________________________________________________________________
@@ -99,8 +108,14 @@ def graph_search(problem, fringe):
     If two paths reach a state, only use the best one. [Fig. 3.18]"""
     closed = {}
     fringe.append(Node(problem.initial))
+    # Contabilizar el nodo inicial como generado
+    problem.nodes_generated = 1 
+    
     while fringe:
         node = fringe.pop()
+        # Contabilizar el nodo visitado (Parte 3) 
+        problem.nodes_visited += 1 
+        
         if problem.goal_test(node.state):
             return node
         if node.state not in closed:
@@ -118,6 +133,20 @@ def depth_first_graph_search(problem):
     """Search the deepest nodes in the search tree first. [p 74]"""
     return graph_search(problem, Stack())
 
+
+# Ramificación y Acotación (Uniform Cost Search) (Parte 1) 
+def uniform_cost_search(problem):
+    """Ramificación y Acotación. La prioridad es el coste de camino acumulado (g)."""
+    # Usamos PriorityQueue con la función de coste del nodo (path_cost)
+    return graph_search(problem, PriorityQueue(lambda node: node.path_cost))
+
+
+# Ramificación y Acotación con Subestimación (A* Search) (Parte 2) 
+def astar_search(problem):
+    """Ramificación y Acotación con Subestimación (A*). Prioridad = g + h."""
+    # Usamos PriorityQueue con la función de coste total estimado (f = g + h)
+    # problem.h(node) ya implementa la heurística euclídea [cite: 17]
+    return graph_search(problem, PriorityQueue(lambda node: node.path_cost + problem.h(node)))
 
 
 # _____________________________________________________________________________
@@ -253,12 +282,15 @@ class GPSProblem(Problem):
         return [(B, B) for B in list(self.graph.get(A).keys())]
 
     def path_cost(self, cost_so_far, A, action, B):
-        return cost_so_far + (self.graph.get(A, B) or infinity)
+        # Utiliza la distancia entre los nodos del grafo de Rumanía [cite: 20]
+        return cost_so_far + (self.graph.get(A, B) or infinity) 
 
     def h(self, node):
-        """h function is straight-line distance from a node's state to goal."""
+        """h function is straight-line distance from a node's state to goal. 
+        Esto se usa como la heurística euclídea (subestimación)[cite: 17]."""
         locs = getattr(self.graph, 'locations', None)
         if locs:
-            return int(distance(locs[node.state], locs[self.goal]))
+            # Calcula la distancia euclídea (recta) al objetivo
+            return int(distance(locs[node.state], locs[self.goal])) 
         else:
             return infinity

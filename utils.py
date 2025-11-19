@@ -1,3 +1,9 @@
+import copy
+import operator
+import random
+import sys
+import math
+import bisect # Nuevo import necesario para PriorityQueue
 
 #______________________________________________________________________________
 # Simple Data Structures: infinity, Dict, Struct
@@ -544,10 +550,29 @@ class FIFOQueue(Queue):
         return e
 
 
+class PriorityQueue(Queue):
+    """A Queue in which the item with the lowest priority (computed by function
+    f and default min) is always popped first."""
+
+    def __init__(self, f=lambda x: x):
+        self.A = []
+        self.f = f
+
+    def append(self, item):
+        # Usamos bisect para insertar (prioridad, item) manteniendo el orden
+        bisect.insort(self.A, (self.f(item), item))
+
+    def __len__(self):
+        return len(self.A)
+
+    def pop(self):
+        # Extrae el elemento de menor prioridad (el primero) y devuelve solo el item
+        return self.A.pop(0)[1]
+
+    def extend(self, items):
+        for item in items:
+            self.append(item)
 
 ## Fig: The idea is we can define things like Fig[3,10] later.
 ## Alas, it is Fig[3,10] not Fig[3.10], because that would be the same as Fig[3.1]
 Fig = {}
-
-
-
