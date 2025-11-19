@@ -3,8 +3,7 @@ import operator
 import random
 import sys
 import math
-import bisect # Nuevo import necesario para PriorityQueue
-
+import bisect 
 #______________________________________________________________________________
 # Simple Data Structures: infinity, Dict, Struct
 
@@ -552,22 +551,26 @@ class FIFOQueue(Queue):
 
 class PriorityQueue(Queue):
     """A Queue in which the item with the lowest priority (computed by function
-    f and default min) is always popped first."""
+    f and default min) is always popped first.
+    The implementation is modified to use a unique counter to break ties safely in Python 3."""
 
     def __init__(self, f=lambda x: x):
         self.A = []
         self.f = f
+        self.counter = 0 # Añadido: Contador único para desempate
 
     def append(self, item):
-        # Usamos bisect para insertar (prioridad, item) manteniendo el orden
-        bisect.insort(self.A, (self.f(item), item))
+        # La tupla ahora es (prioridad, contador, item). 
+        # Si la prioridad es la misma, el contador único (segunda posición) se usa para el desempate, evitando comparar 'Node' con 'Node'.
+        bisect.insort(self.A, (self.f(item), self.counter, item))
+        self.counter += 1 # Incrementar el contador para el siguiente elemento
 
     def __len__(self):
         return len(self.A)
 
     def pop(self):
-        # Extrae el elemento de menor prioridad (el primero) y devuelve solo el item
-        return self.A.pop(0)[1]
+        # Extrae el elemento de menor prioridad (el primero) y devuelve solo el item (índice 2)
+        return self.A.pop(0)[2]
 
     def extend(self, items):
         for item in items:
