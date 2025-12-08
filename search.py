@@ -151,7 +151,7 @@ romania = UndirectedGraph(Dict(
     P=Dict(R=97),
     R=Dict(S=80),
     U=Dict(V=142),
-    Z=Dict(O=71))) 
+    Z=Dict(O=71)))
 
 romania.locations = Dict(
     A=(91, 492), B=(400, 327), C=(253, 288), D=(165, 299),
