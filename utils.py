@@ -1,8 +1,7 @@
 import math
 import heapq
-import operator # Necesario para la compatibilidad original
+import operator 
 
-# --- CÓDIGO BASE ORIGINAL (Indispensable para no romper interfaces) ---
 def abstract():
     raise NotImplementedError("Abstract method")
 
@@ -46,9 +45,7 @@ class Stack(Queue):
     def pop(self):
         return self.A.pop()
 
-# --- AÑADIDO PARA LA PRÁCTICA (Parte 1 y 2) ---
 class PriorityQueue(Queue):
-    """Cola de prioridad requerida para Branch & Bound y A*."""
     def __init__(self, order='min', f=lambda x: x):
         self.heap = []
         if order == 'min':
@@ -59,11 +56,9 @@ class PriorityQueue(Queue):
             raise ValueError("order must be 'min' or 'max'")
 
     def append(self, item):
-        # Insertamos (prioridad, item)
         heapq.heappush(self.heap, (self.f(item), item))
 
     def pop(self):
-        # Devolvemos solo el item
         return heapq.heappop(self.heap)[1]
 
     def __len__(self):
