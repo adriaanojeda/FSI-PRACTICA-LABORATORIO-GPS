@@ -2,6 +2,8 @@ import math
 import heapq
 import operator 
 
+infinity = float('inf')
+
 def abstract():
     raise NotImplementedError("Abstract method")
 
@@ -46,14 +48,9 @@ class Stack(Queue):
         return self.A.pop()
 
 class PriorityQueue(Queue):
-    def __init__(self, order='min', f=lambda x: x):
+    def __init__(self, f=lambda x: x):
         self.heap = []
-        if order == 'min':
-            self.f = f
-        elif order == 'max':
-            self.f = lambda x: -f(x)
-        else:
-            raise ValueError("order must be 'min' or 'max'")
+        self.f = f
 
     def append(self, item):
         heapq.heappush(self.heap, (self.f(item), item))
@@ -63,3 +60,17 @@ class PriorityQueue(Queue):
 
     def __len__(self):
         return len(self.heap)
+
+    def __contains__(self, item):
+        return any(item == pair[1] for pair in self.heap)
+
+    def __getitem__(self, key):
+        for _, item in self.heap:
+            if item == key: return item
+
+    def __delitem__(self, key):
+        try:
+            del self.heap[[item == key for _, item in self.heap].index(True)]
+            heapq.heapify(self.heap)
+        except ValueError:
+            raise KeyError(str(key) + " is not in the priority queue")

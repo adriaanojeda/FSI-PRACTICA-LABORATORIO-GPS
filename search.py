@@ -1,34 +1,4 @@
 from utils import *
-import heapq
-import math
-
-class PriorityQueue(Queue):
-    def __init__(self, f=lambda x: x):
-        self.heap = []
-        self.f = f
-
-    def append(self, item):
-        heapq.heappush(self.heap, (self.f(item), item))
-
-    def pop(self):
-        return heapq.heappop(self.heap)[1]
-
-    def __len__(self):
-        return len(self.heap)
-
-    def __contains__(self, item):
-        return any(item == pair[1] for pair in self.heap)
-
-    def __getitem__(self, key):
-        for _, item in self.heap:
-            if item == key: return item
-
-    def __delitem__(self, key):
-        try:
-            del self.heap[[item == key for _, item in self.heap].index(True)]
-            heapq.heapify(self.heap)
-        except ValueError:
-            raise KeyError(str(key) + " is not in the priority queue")
 
 class Problem:
     def __init__(self, initial, goal=None):
@@ -150,8 +120,7 @@ romania = UndirectedGraph(Dict(
     O=Dict(Z=71, S=151),
     P=Dict(R=97),
     R=Dict(S=80),
-    U=Dict(V=142),
-    Z=Dict(O=71)))
+    U=Dict(V=142)))
 
 romania.locations = Dict(
     A=(91, 492), B=(400, 327), C=(253, 288), D=(165, 299),
